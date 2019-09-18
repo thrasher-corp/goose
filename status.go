@@ -3,11 +3,15 @@ package goose
 import (
 	"database/sql"
 	"fmt"
-	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
 )
+
+func splitFile(r rune) bool {
+	return r == '/' || r == '_'
+}
 
 // Status prints the status of all migrations.
 func Status(db *sql.DB, dir, dbType string) error {
@@ -26,7 +30,10 @@ func Status(db *sql.DB, dir, dbType string) error {
 	log.Println("    Applied At                  Migration")
 	log.Println("    =======================================")
 	for _, migration := range migrations {
-		if err := printMigrationStatus(db, migration.Version, fmt.Sprintf("%d_%s", migration.Version, filepath.Base(migration.Source))); err != nil {
+		x := strings.Split(migration.Source, "migrations/")
+		name := strings.Split(x[1], "/")
+
+		if err := printMigrationStatus(db, migration.Version, fmt.Sprintf("%d_%s", migration.Version, name[0][15:])); err != nil {
 			return errors.Wrap(err, "failed to print status")
 		}
 	}

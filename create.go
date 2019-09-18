@@ -66,33 +66,28 @@ func Create(db *sql.DB, dir, name, migrationType string) error {
 	return CreateWithTemplate(db, dir, nil, name, migrationType)
 }
 
-var sqlMigrationTemplate = template.Must(template.New("gct.sql-migration").Parse(`-- +gct Up
--- +gct StatementBegin
+var sqlMigrationTemplate = template.Must(template.New("goose.sql-migration").Parse(`-- +goose Up
+-- +goose StatementBegin
 SELECT 'up SQL query';
--- +gct StatementEnd
-
--- +gct Down
--- +gct StatementBegin
+-- +goose StatementEnd
+-- +goose Down
+-- +goose StatementBegin
 SELECT 'down SQL query';
--- +gct StatementEnd
+-- +goose StatementEnd
 `))
 
-var goSQLMigrationTemplate = template.Must(template.New("gct.go-migration").Parse(`package migrations
-
+var goSQLMigrationTemplate = template.Must(template.New("goose.go-migration").Parse(`package migrations
 import (
 	"database/sql"
-	 "github.com/thrasher-corp/goose"
+	"github.com/pressly/goose"
 )
-
 func init() {
 	goose.AddMigration(up{{.CamelName}}, down{{.CamelName}})
 }
-
 func up{{.CamelName}}(tx *sql.Tx) error {
 	// This code is executed when the migration is applied.
 	return nil
 }
-
 func down{{.CamelName}}(tx *sql.Tx) error {
 	// This code is executed when the migration is rolled back.
 	return nil

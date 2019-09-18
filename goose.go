@@ -24,7 +24,7 @@ func SetVerbose(v bool) {
 
 // Run runs a goose command.
 func Run(command string, db *sql.DB, dbType, dir string, args ...string) error {
-	fmt.Println(dbType)
+	SetDialect(dbType)
 	switch command {
 	case "up":
 		if err := Up(db, dir, dbType); err != nil {

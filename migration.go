@@ -134,7 +134,7 @@ func NumericComponent(name string) (int64, error) {
 		return 0, errors.New("not a recognized migration file type")
 	}
 
-	versionFolder := strings.Split(name, "/database/migrations/")
+	versionFolder := strings.Split(name, "migrations/")
 	idx := strings.Index(versionFolder[1], "_")
 	if idx < 0 {
 		return 0, errors.New("no separator found")
