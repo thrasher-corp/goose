@@ -2,7 +2,6 @@ package goose
 
 import (
 	"database/sql"
-	"fmt"
 	"os"
 	"path/filepath"
 	"text/template"
@@ -19,17 +18,25 @@ type tmplVars struct {
 // Create writes a new blank migration file.
 func CreateWithTemplate(db *sql.DB, dir string, tmpl *template.Template, name, migrationType string) error {
 	version := time.Now().Format(timestampFormat)
-	filename := fmt.Sprintf("%v_%v.%v", version, snakeCase(name), migrationType)
+	filename := snakeCase(name)
+	tmpl = sqlMigrationTemplate
 
-	if tmpl == nil {
-		if migrationType == "go" {
-			tmpl = goSQLMigrationTemplate
-		} else {
-			tmpl = sqlMigrationTemplate
-		}
+	migrationPath := filepath.Join(dir, version+"_"+filename)
+	err := os.MkdirAll(migrationPath, os.ModePerm)
+	if err != nil {
+		return errors.Wrap(err, "faile to create migration folder")
 	}
 
-	path := filepath.Join(dir, filename)
+	_ = createFile(migrationPath, "postgres.sql", version, tmpl)
+	_ = createFile(migrationPath, "sqlite.sql", version, tmpl)
+
+	return nil
+}
+
+func createFile(migrationPath, name, version string, tmpl *template.Template) error {
+
+	path := filepath.Join(migrationPath, name)
+
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
 		return errors.Wrap(err, "failed to create migration file")
 	}
@@ -38,6 +45,7 @@ func CreateWithTemplate(db *sql.DB, dir string, tmpl *template.Template, name, m
 	if err != nil {
 		return errors.Wrap(err, "failed to create migration file")
 	}
+
 	defer f.Close()
 
 	vars := tmplVars{
@@ -49,6 +57,7 @@ func CreateWithTemplate(db *sql.DB, dir string, tmpl *template.Template, name, m
 	}
 
 	log.Printf("Created new file: %s\n", f.Name())
+
 	return nil
 }
 
@@ -57,22 +66,22 @@ func Create(db *sql.DB, dir, name, migrationType string) error {
 	return CreateWithTemplate(db, dir, nil, name, migrationType)
 }
 
-var sqlMigrationTemplate = template.Must(template.New("goose.sql-migration").Parse(`-- +goose Up
--- +goose StatementBegin
+var sqlMigrationTemplate = template.Must(template.New("gct.sql-migration").Parse(`-- +gct Up
+-- +gct StatementBegin
 SELECT 'up SQL query';
--- +goose StatementEnd
+-- +gct StatementEnd
 
--- +goose Down
--- +goose StatementBegin
+-- +gct Down
+-- +gct StatementBegin
 SELECT 'down SQL query';
--- +goose StatementEnd
+-- +gct StatementEnd
 `))
 
-var goSQLMigrationTemplate = template.Must(template.New("goose.go-migration").Parse(`package migrations
+var goSQLMigrationTemplate = template.Must(template.New("gct.go-migration").Parse(`package migrations
 
 import (
 	"database/sql"
-	"github.com/pressly/goose"
+	 "github.com/thrasher-corp/goose"
 )
 
 func init() {

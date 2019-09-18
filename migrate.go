@@ -141,9 +141,43 @@ func AddNamedMigration(filename string, up func(*sql.Tx) error, down func(*sql.T
 	registeredGoMigrations[v] = migration
 }
 
+func WalkAllFilesInDir(dir string) error {
+	return filepath.Walk(dir, func(path string, info os.FileInfo, e error) error {
+		if e != nil {
+			return e
+		}
+
+		// check if it is a regular file (not dir)
+		if info.Mode().IsRegular() {
+			fmt.Println("file name:", info.Name())
+			fmt.Println("file path:", path)
+		}
+		return nil
+	})
+}
+
+func glob(dir, dbType, fileExt string) ([]string, error) {
+	var fileList []string
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, e error) error {
+		if e != nil {
+			return e
+		}
+		if info.Mode().IsRegular() {
+			if info.Name() == dbType+fileExt {
+				fileList = append(fileList, path)
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return []string{}, err
+	}
+	return fileList, nil
+}
+
 // CollectMigrations returns all the valid looking migration scripts in the
 // migrations folder and go func registry, and key them by version.
-func CollectMigrations(dirpath string, current, target int64) (Migrations, error) {
+func CollectMigrations(dirpath, dbType string, current, target int64) (Migrations, error) {
 	if _, err := os.Stat(dirpath); os.IsNotExist(err) {
 		return nil, fmt.Errorf("%s directory does not exists", dirpath)
 	}
@@ -151,7 +185,8 @@ func CollectMigrations(dirpath string, current, target int64) (Migrations, error
 	var migrations Migrations
 
 	// SQL migration files.
-	sqlMigrationFiles, err := filepath.Glob(dirpath + "/**.sql")
+	sqlMigrationFiles, err := glob(dirpath, dbType, ".sql")
+
 	if err != nil {
 		return nil, err
 	}
@@ -178,7 +213,7 @@ func CollectMigrations(dirpath string, current, target int64) (Migrations, error
 	}
 
 	// Go migration files
-	goMigrationFiles, err := filepath.Glob(dirpath + "/**.go")
+	goMigrationFiles, err := glob(dirpath, dbType, ".go")
 	if err != nil {
 		return nil, err
 	}

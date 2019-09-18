@@ -5,8 +5,8 @@ import (
 )
 
 // UpTo migrates up to a specific version.
-func UpTo(db *sql.DB, dir string, version int64) error {
-	migrations, err := CollectMigrations(dir, minVersion, version)
+func UpTo(db *sql.DB, dir, dbType string, version int64) error {
+	migrations, err := CollectMigrations(dir, dbType, minVersion, version)
 	if err != nil {
 		return err
 	}
@@ -33,13 +33,13 @@ func UpTo(db *sql.DB, dir string, version int64) error {
 }
 
 // Up applies all available migrations.
-func Up(db *sql.DB, dir string) error {
-	return UpTo(db, dir, maxVersion)
+func Up(db *sql.DB, dir, dbType string) error {
+	return UpTo(db, dir, dbType, maxVersion)
 }
 
 // UpByOne migrates up by a single version.
-func UpByOne(db *sql.DB, dir string) error {
-	migrations, err := CollectMigrations(dir, minVersion, maxVersion)
+func UpByOne(db *sql.DB, dir, dbType string) error {
+	migrations, err := CollectMigrations(dir, dbType, minVersion, maxVersion)
 	if err != nil {
 		return err
 	}

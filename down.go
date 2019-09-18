@@ -6,13 +6,13 @@ import (
 )
 
 // Down rolls back a single migration from the current version.
-func Down(db *sql.DB, dir string) error {
+func Down(db *sql.DB, dbType, dir string) error {
 	currentVersion, err := GetDBVersion(db)
 	if err != nil {
 		return err
 	}
 
-	migrations, err := CollectMigrations(dir, minVersion, maxVersion)
+	migrations, err := CollectMigrations(dir, dbType, minVersion, maxVersion)
 	if err != nil {
 		return err
 	}
@@ -26,8 +26,8 @@ func Down(db *sql.DB, dir string) error {
 }
 
 // DownTo rolls back migrations to a specific version.
-func DownTo(db *sql.DB, dir string, version int64) error {
-	migrations, err := CollectMigrations(dir, minVersion, maxVersion)
+func DownTo(db *sql.DB, dir, dbType string, version int64) error {
+	migrations, err := CollectMigrations(dir, dbType, minVersion, maxVersion)
 	if err != nil {
 		return err
 	}

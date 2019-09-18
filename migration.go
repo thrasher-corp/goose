@@ -134,12 +134,13 @@ func NumericComponent(name string) (int64, error) {
 		return 0, errors.New("not a recognized migration file type")
 	}
 
-	idx := strings.Index(base, "_")
+	versionFolder := strings.Split(name, "/database/migrations/")
+	idx := strings.Index(versionFolder[1], "_")
 	if idx < 0 {
 		return 0, errors.New("no separator found")
 	}
 
-	n, e := strconv.ParseInt(base[:idx], 10, 64)
+	n, e := strconv.ParseInt(versionFolder[1][:idx], 10, 64)
 	if e == nil && n <= 0 {
 		return 0, errors.New("migration IDs must be greater than zero")
 	}

@@ -2,6 +2,7 @@ package goose
 
 import (
 	"database/sql"
+	"fmt"
 	"path/filepath"
 	"time"
 
@@ -9,14 +10,15 @@ import (
 )
 
 // Status prints the status of all migrations.
-func Status(db *sql.DB, dir string) error {
+func Status(db *sql.DB, dir, dbType string) error {
 	// collect all migrations
-	migrations, err := CollectMigrations(dir, minVersion, maxVersion)
+	migrations, err := CollectMigrations(dir, dbType, minVersion, maxVersion)
 	if err != nil {
 		return errors.Wrap(err, "failed to collect migrations")
 	}
 
 	// must ensure that the version table exists if we're running on a pristine DB
+	SetDialect(dbType)
 	if _, err := EnsureDBVersion(db); err != nil {
 		return errors.Wrap(err, "failed to ensure DB version")
 	}
@@ -24,7 +26,7 @@ func Status(db *sql.DB, dir string) error {
 	log.Println("    Applied At                  Migration")
 	log.Println("    =======================================")
 	for _, migration := range migrations {
-		if err := printMigrationStatus(db, migration.Version, filepath.Base(migration.Source)); err != nil {
+		if err := printMigrationStatus(db, migration.Version, fmt.Sprintf("%d_%s", migration.Version, filepath.Base(migration.Source))); err != nil {
 			return errors.Wrap(err, "failed to print status")
 		}
 	}

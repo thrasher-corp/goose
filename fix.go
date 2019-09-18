@@ -7,8 +7,8 @@ import (
 	"strings"
 )
 
-func Fix(dir string) error {
-	migrations, err := CollectMigrations(dir, minVersion, maxVersion)
+func Fix(dir, dbType string) error {
+	migrations, err := CollectMigrations(dir, dbType, minVersion, maxVersion)
 	if err != nil {
 		return err
 	}

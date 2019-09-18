@@ -8,8 +8,8 @@ import (
 )
 
 // Reset rolls back all migrations
-func Reset(db *sql.DB, dir string) error {
-	migrations, err := CollectMigrations(dir, minVersion, maxVersion)
+func Reset(db *sql.DB, dir, dbType string) error {
+	migrations, err := CollectMigrations(dir, dbType, minVersion, maxVersion)
 	if err != nil {
 		return errors.Wrap(err, "failed to collect migrations")
 	}

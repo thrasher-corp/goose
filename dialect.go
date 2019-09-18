@@ -29,7 +29,7 @@ func SetDialect(d string) error {
 		dialect = &PostgresDialect{}
 	case "mysql":
 		dialect = &MySQLDialect{}
-	case "sqlite3":
+	case "sqlite3", "sqlite":
 		dialect = &Sqlite3Dialect{}
 	case "mssql":
 		dialect = &SqlServerDialect{}
@@ -155,11 +155,11 @@ WITH Migrations AS
 (
     SELECT tstamp, is_applied,
     ROW_NUMBER() OVER (ORDER BY tstamp) AS 'RowNumber'
-    FROM %s 
+    FROM %s
 	WHERE version_id=@p1
-) 
-SELECT tstamp, is_applied 
-FROM Migrations 
+)
+SELECT tstamp, is_applied
+FROM Migrations
 WHERE RowNumber BETWEEN 1 AND 2
 ORDER BY tstamp DESC
 `
