@@ -28,7 +28,7 @@ func CreateWithTemplate(db *sql.DB, dir string, tmpl *template.Template, name, m
 	}
 
 	_ = createFile(migrationPath, "postgres.sql", version, tmpl)
-	_ = createFile(migrationPath, "sqlite.sql", version, tmpl)
+	_ = createFile(migrationPath, "sqlite3.sql", version, tmpl)
 
 	return nil
 }

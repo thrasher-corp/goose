@@ -20,7 +20,6 @@ func Status(db *sql.DB, dir, dbType string) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to collect migrations")
 	}
-
 	// must ensure that the version table exists if we're running on a pristine DB
 	SetDialect(dbType)
 	if _, err := EnsureDBVersion(db); err != nil {
@@ -29,6 +28,7 @@ func Status(db *sql.DB, dir, dbType string) error {
 
 	log.Println("    Applied At                  Migration")
 	log.Println("    =======================================")
+
 	for _, migration := range migrations {
 		x := strings.Split(migration.Source, "migrations/")
 		name := strings.Split(x[1], "/")
