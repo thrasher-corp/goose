@@ -141,21 +141,6 @@ func AddNamedMigration(filename string, up func(*sql.Tx) error, down func(*sql.T
 	registeredGoMigrations[v] = migration
 }
 
-func WalkAllFilesInDir(dir string) error {
-	return filepath.Walk(dir, func(path string, info os.FileInfo, e error) error {
-		if e != nil {
-			return e
-		}
-
-		// check if it is a regular file (not dir)
-		if info.Mode().IsRegular() {
-			fmt.Println("file name:", info.Name())
-			fmt.Println("file path:", path)
-		}
-		return nil
-	})
-}
-
 func glob(dir, dbType, fileExt string) ([]string, error) {
 	var fileList []string
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, e error) error {

@@ -24,7 +24,7 @@ func CreateWithTemplate(db *sql.DB, dir string, tmpl *template.Template, name, m
 	migrationPath := filepath.Join(dir, version+"_"+filename)
 	err := os.MkdirAll(migrationPath, os.ModePerm)
 	if err != nil {
-		return errors.Wrap(err, "faile to create migration folder")
+		return errors.Wrap(err, "failed to create migration folder")
 	}
 
 	_ = createFile(migrationPath, "postgres.sql", version, tmpl)
