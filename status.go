@@ -30,9 +30,8 @@ func Status(db *sql.DB, dir, dbType string) error {
 
 	for _, migration := range migrations {
 		x := strings.Split(migration.Source, "migrations")
-		name := strings.Split(x[1], "/")
 
-		if err := printMigrationStatus(db, migration.Version, name[1]); err != nil {
+		if err := printMigrationStatus(db, migration.Version, x[1][1:]); err != nil {
 			return errors.Wrap(err, "failed to print status")
 		}
 	}
