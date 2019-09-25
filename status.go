@@ -2,7 +2,6 @@ package goose
 
 import (
 	"database/sql"
-	"fmt"
 	"strings"
 	"time"
 
@@ -30,10 +29,10 @@ func Status(db *sql.DB, dir, dbType string) error {
 	log.Println("    =======================================")
 
 	for _, migration := range migrations {
-		x := strings.Split(migration.Source, "migrations/")
+		x := strings.Split(migration.Source, "migrations")
 		name := strings.Split(x[1], "/")
 
-		if err := printMigrationStatus(db, migration.Version, fmt.Sprintf("%d_%s", migration.Version, name[0][15:])); err != nil {
+		if err := printMigrationStatus(db, migration.Version, name[1]); err != nil {
 			return errors.Wrap(err, "failed to print status")
 		}
 	}
