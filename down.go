@@ -6,7 +6,7 @@ import (
 )
 
 // Down rolls back a single migration from the current version.
-func Down(db *sql.DB, dbType, dir string) error {
+func Down(db *sql.DB, dir, dbType string) error {
 	currentVersion, err := GetDBVersion(db)
 	if err != nil {
 		return err
