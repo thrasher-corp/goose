@@ -68,10 +68,12 @@ func (m *Migration) run(db *sql.DB, direction bool) error {
 			return errors.Wrapf(err, "ERROR %v: failed to run SQL migration", filepath.Base(m.Source))
 		}
 
+		x := strings.Split(m.Source, "migrations")
+		name := x[1][1:]
 		if len(statements) > 0 {
-			log.Println("OK   ", filepath.Base(m.Source))
+			log.Println("OK   ", name)
 		} else {
-			log.Println("EMPTY", filepath.Base(m.Source))
+			log.Println("EMPTY", name)
 		}
 
 	case ".go":
@@ -112,10 +114,12 @@ func (m *Migration) run(db *sql.DB, direction bool) error {
 			return errors.Wrap(err, "ERROR failed to commit transaction")
 		}
 
+		x := strings.Split(m.Source, "migrations")
+		name := x[1][1:]
 		if fn != nil {
-			log.Println("OK   ", filepath.Base(m.Source))
+			log.Println("OK   ", name)
 		} else {
-			log.Println("EMPTY", filepath.Base(m.Source))
+			log.Println("EMPTY", name)
 		}
 
 		return nil
